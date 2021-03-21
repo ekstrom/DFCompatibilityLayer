@@ -1,0 +1,90 @@
+Use Windows.pkg
+Use cHtmlHelp.pkg
+Use cApplication.pkg
+
+Object oHtmlHelp is a cHtmlHelp
+End_Object
+
+Object oApplication is a cApplication
+End_Object
+
+#IFNDEF DFCompatibilityLayer
+Use ..\..\DFCompatibilityLayer.pkg
+#ENDIF
+
+Procedure StringToUCharArray_Test String[] ByRef saResults
+    String s
+    UChar[] ucArray1 ucArray2
+    Move "abc" to s
+    Move (StringToUCharArray(s)) to ucArray1
+    Move (StringToUCharArray(s + Character(0))) to ucArray2
+    
+    If (SizeOfArray(ucArray1) = 3 and ucArray1[0] = 97 and ucArray1[1] = 98 and ucArray1[2] = 99 and ;
+        SizeOfArray(ucArray2) = 4 and ucArray1[0] = ucArray2[0] and ucArray1[1] = ucArray2[1] and ucArray1[2] = ucArray2[2] and ucArray2[3] = 0) Begin
+        Move ("StringToUCharArray_Test succeeded") to saResults[SizeOfArray(saResults)]
+    End
+    Else Begin
+        Move ("StringToUCharArray_Test failed") to saResults[SizeOfArray(saResults)]
+    End    
+End_Procedure
+
+Procedure PointerToString_Test String[] ByRef saResults
+    String s1 s2
+    Address aSource
+    Move "abc" to s1
+    Move (AddressOf(s1)) to aSource
+    Move (PointerToString(aSource)) to s2
+    
+    If (s1 = s2 and Length(s1) = Length(s2)) Begin
+        Move ("PointerToString_Test succeeded") to saResults[SizeOfArray(saResults)]
+    End
+    Else Begin
+        Move ("PointerToString_Test failed") to saResults[SizeOfArray(saResults)]
+    End    
+End_Procedure
+
+Procedure SizeOfString_Test String[] ByRef saResults
+    String s
+    Move "abc" to s
+    
+    If (SizeOfString(s) = 3) Begin
+        Move ("SizeOfString_Test succeeded") to saResults[SizeOfArray(saResults)]
+    End
+    Else Begin
+        Move ("SizeOfString_Test failed") to saResults[SizeOfArray(saResults)]
+    End
+End_Procedure
+
+Procedure File_Exist_Compat_Test String[] ByRef saResults
+    Boolean bFileExists
+    String sProgramPath
+    Move (psProgramPath(phoWorkspace(oApplication)) + "\èéô_test_file.txt") to sProgramPath
+    File_Exist_Compat sProgramPath bFileExists
+    
+    If (bFileExists) Begin
+        Move ("File_Exist_Compat_Test succeeded") to saResults[SizeOfArray(saResults)]
+    End
+    Else Begin
+        Move ("File_Exist_Compat_Test failed") to saResults[SizeOfArray(saResults)]
+    End
+End_Procedure
+
+Procedure RunTests
+    Integer i
+    String sResults sNewLine
+    String[] saResults
+    
+    Send StringToUCharArray_Test (&saResults)
+    Send PointerToString_Test (&saResults)
+    Send SizeOfString_Test (&saResults)
+    Send File_Exist_Compat_Test (&saResults)
+    
+    Move (Character(13) + Character(10)) to sNewLine
+    For i from 0 to (SizeOfArray(saResults) - 1)
+        Move (sResults + saResults[i] + sNewLine) to sResults
+    Loop
+    
+    Send Info_Box sResults "Results"
+End_Procedure
+
+Send RunTests

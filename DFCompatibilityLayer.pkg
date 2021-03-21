@@ -1,0 +1,56 @@
+// Created by ekstrom and published on github.com/ekstrom/DFCompatibilityLayer
+// Version: 0.1
+// License: MIT
+
+Define DFCompatibilityLayer for 1
+
+// Add functionality if DataFlex < 18.1
+#IF (!@ < 181)
+
+// Replacement for StringToUCharArray if you are using DataFlex < 18.1
+Function StringToUCharArray Global String asText Returns UChar[]
+    Integer iLength
+    UChar[] ucArray
+    Address aDestination aSource
+    Boolean bOk
+    Move (Length(asText)) to iLength
+    Move (ResizeArray(ucArray, iLength)) to ucArray
+    Move (AddressOf(ucArray)) to aDestination
+    Move (AddressOf(asText)) to aSource
+    Move (MemCopy(aDestination, aSource, iLength)) to bOk
+    Function_Return ucArray
+End_Function
+
+#ENDIF
+
+
+// Add functionality if DataFlex < 20.0
+#IF (!@ < 200)
+
+// PointerToString creates a new string based on what a pointer is pointing to
+Function PointerToString Global Address asText Returns String
+    Function_Return asText
+End_Function
+
+// SizeOfString returns the number of bytes of a string in memory
+Function SizeOfString Global String sOEM Returns Integer
+    Function_Return (Length(sOEM))
+End_Function
+
+// File_Exist_Compat checks if a file or folder exists for the native string encoding of the DataFlex version that you are running (where input is an OEM string)
+#COMMAND File_Exist_Compat R R .
+    File_Exist (ToAnsi(!1)) !2
+#ENDCOMMAND
+    
+#ENDIF
+
+
+// Add functionality if DataFlex >= 20.0
+#IF (!@ >= 200)
+    
+// File_Exist_Compat checks if a file or folder exists for the native string encoding of the DataFlex version that you are running (where input is an UTF-8 string)
+#COMMAND File_Exist_Compat R R .
+    File_Exist !1 !2
+#ENDCOMMAND
+    
+#ENDIF

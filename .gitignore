@@ -1,0 +1,9 @@
+IdeSrc/
+Programs/
+
+*.dep
+*.exe.manifest
+*.prn
+
+classlist.xml
+LoginEncryptionKey.inc
