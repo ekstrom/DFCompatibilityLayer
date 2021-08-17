@@ -28,6 +28,64 @@ Procedure StringToUCharArray_Test String[] ByRef saResults
     End    
 End_Procedure
 
+Procedure UCharArrayToString_Test1 String[] ByRef saResults
+    UChar[] uaCharacters
+    String sResult
+    Integer iExpectedLength
+    
+    Move (Ascii("t")) to uaCharacters[SizeOfArray(uaCharacters)]
+    Move (Ascii("e")) to uaCharacters[SizeOfArray(uaCharacters)]
+    Move (Ascii("s")) to uaCharacters[SizeOfArray(uaCharacters)]
+    Move (Ascii("t")) to uaCharacters[SizeOfArray(uaCharacters)]
+    Move 0 to uaCharacters[SizeOfArray(uaCharacters)]
+    Move 0 to uaCharacters[SizeOfArray(uaCharacters)]
+    Move (UCharArrayToString(uaCharacters)) to sResult
+    
+    // DataFlex 18.1 - 19.1 does not return the same result as 20.0
+    // DFCompatibilityLayer returns the same result as 20.0
+    #IF (!@ >= 200)
+    Move 5 to iExpectedLength
+    #ENDIF
+    #IF (!@ < 200)
+    Move 6 to iExpectedLength
+    #ENDIF
+    #IF (!@ < 181)
+    Move 5 to iExpectedLength
+    #ENDIF
+    
+    If (sResult = "test" and Length(sResult) = iExpectedLength) Begin
+        Move ("UCharArrayToString_Test1 succeeded") to saResults[SizeOfArray(saResults)]
+    End
+    Else Begin
+        Move ("UCharArrayToString_Test1 failed") to saResults[SizeOfArray(saResults)]
+    End
+End_Procedure
+
+Procedure UCharArrayToString_Test2 String[] ByRef saResults
+    UChar[] uaCharacters
+    String sResult sExpectedResult
+    Move (Ascii("t")) to uaCharacters[SizeOfArray(uaCharacters)]
+    Move (Ascii("e")) to uaCharacters[SizeOfArray(uaCharacters)]
+    Move (Ascii("s")) to uaCharacters[SizeOfArray(uaCharacters)]
+    Move (Ascii("t")) to uaCharacters[SizeOfArray(uaCharacters)]
+    Move (UCharArrayToString(uaCharacters, 2, 2)) to sResult
+    
+    // DataFlex 18.2 - 20.0 does not return the same result as 18.1
+    // DFCompatibilityLayer returns the same result as 18.2 - 20.0
+    #IF (!@ = 181)
+    Move "" to sExpectedResult
+    #ELSE
+    Move "st" to sExpectedResult
+    #ENDIF
+    
+    If (sResult = sExpectedResult) Begin
+        Move ("UCharArrayToString_Test2 succeeded") to saResults[SizeOfArray(saResults)]
+    End
+    Else Begin
+        Move ("UCharArrayToString_Test2 failed") to saResults[SizeOfArray(saResults)]
+    End
+End_Procedure
+
 Procedure PointerToString_Test String[] ByRef saResults
     String s1 s2
     Address aSource
@@ -74,6 +132,8 @@ Procedure RunTests
     String sResults sNewLine
     String[] saResults
     
+    Send UCharArrayToString_Test1 (&saResults)
+    Send UCharArrayToString_Test2 (&saResults)
     Send StringToUCharArray_Test (&saResults)
     Send PointerToString_Test (&saResults)
     Send SizeOfString_Test (&saResults)

@@ -19,6 +19,10 @@ Use DFCompatibilityLayer.pkg
 
 StringToUCharArray converts a string to UChar[]. StringToUCharArray does the same thing as the built in version of StringToUCharArray in DataFlex 18.1+, but you can call it in DataFlex 14.1-18.0.
 
+### UCharArrayToString
+
+UCharArrayToString converts a UChar[] to a string. UCharArrayToString does the same thing as the built in version of UCharArrayToString in DataFlex 18.1+, but you can call it in DataFlex 14.1-18.0.
+
 ### PointerToString
 
 Copy a string. In DataFlex 14.1-19.1, an address can be moved to a string to create a new copy of a string.

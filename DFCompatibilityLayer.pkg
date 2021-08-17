@@ -1,5 +1,5 @@
 // Created by ekstrom and published on github.com/ekstrom/DFCompatibilityLayer
-// Version: 0.1
+// Version: 0.2
 // License: MIT
 
 Define DFCompatibilityLayer for 1
@@ -19,6 +19,37 @@ Function StringToUCharArray Global String asText Returns UChar[]
     Move (AddressOf(asText)) to aSource
     Move (MemCopy(aDestination, aSource, iLength)) to bOk
     Function_Return ucArray
+End_Function
+
+Function UCharArrayToString Global UChar[] ucArray Integer iLengthOptional Integer iOffsetOptional Returns String
+    Integer i iLastChar iOffset
+    String sResult
+    
+    If (num_arguments >= 2) Begin
+        Move (iLengthOptional - 1) to iLastChar
+    End
+    Else Begin
+        Move (SizeOfArray(ucArray) - 1) to iLastChar
+    End
+    
+    If (num_arguments >= 3) Begin
+        Move iOffsetOptional to iOffset
+    End
+    Else Begin
+        Move 0 to iOffset
+    End
+    
+    Move (iLastChar + iOffset) to iLastChar
+    If (iLastChar >= SizeOfArray(ucArray)) Begin
+        Move (SizeOfArray(ucArray) - 1) to iLastChar
+    End
+    
+    For i from iOffset to iLastChar
+        If (ucArray[i] = 0 and i = iLastChar) Break
+        Move (sResult + Character(ucArray[i])) to sResult
+    Loop
+    
+    Function_Return sResult
 End_Function
 
 #ENDIF
